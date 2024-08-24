@@ -1,0 +1,10 @@
+build/
+.vscode/
+LICENSE.txt
+LICENSE.txt:Zone.Identifier
+README.md
+README.md:Zone.Identifier
+boids
+boids.t
+gitignore.txt
+gitignore.txt:Zone.Identifier
