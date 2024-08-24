@@ -1,12 +1,16 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "position.hpp"
-#include "speed.hpp"
+#include "boids.hpp"
+#include <stdexcept>
 
-#include "doctest.h"
+#include "doctest.h"    
+//UTILIZZARE DOCTEST.APPROX!!! E EPSILON
+//per popolare usare generatori di numeri casuali????
 
 TEST_CASE("Testing the near boids function"){
 
-    std::vector<pf::boid> boids(4); 
+ 
+
+    std::vector<pf::boid> boids(8); 
     long unsigned int i{0};
         
     for(; i < 8; ++i){
@@ -22,9 +26,13 @@ TEST_CASE("Testing the near boids function"){
         CHECK(n.size() == 5); 
     }
 
+    SUBCASE("Testing the exception"){
+        CHECK_THROWS(pf::near_boids(boids, 1, b));
+    }
+
     SUBCASE("Testing the correct estimation of near boids"){
     
-        CHECK(n.size() == 3); 
+        CHECK(n.size() == 5); 
         CHECK(n[0].position.get_x() == 5); 
         CHECK(n[0].position.get_y() == 5); 
         CHECK(n[1].position.get_x() == 10); 
@@ -70,7 +78,7 @@ TEST_CASE("Testing position_now function"){
     speed.set_x(0.5);
     speed.set_y(1.8);
     pf::vector2d p = pf::position_now(position, speed, time); 
-    CHECK(p.get_x() == 2.5);
+    CHECK(p.get_x() == 2.5);   
     CHECK(p.get_y() == 22.2); 
 }
 
@@ -101,43 +109,49 @@ TEST_CASE("Testing speed rules functions"){
 
     SUBCASE("Testing the separation rule"){
         pf::vector2d v1_0 = pf::separation(s, ds, boids[0], boids); 
-        CHECK(v1_0.get_x() == -5.0);
-        CHECK(v1_0.get_y() == -2.25);
+        CHECK(v1_0.get_x() == 5.0);
+        CHECK(v1_0.get_y() == 2.25);
 
         pf::vector2d v1_1 = pf::separation(s, ds, boids[1], boids); 
-        CHECK(v1_1.get_x() == 9.0);
-        CHECK(v1_1.get_y() == 2.75);
+        CHECK(v1_1.get_x() == -9.0);
+        CHECK(v1_1.get_y() == -2.75);
 
         pf::vector2d v1_2 = pf::separation(s, ds, boids[2], boids); 
-        CHECK(v1_2.get_x() == -1.0);
-        CHECK(v1_2.get_y() == -7.25);
+        CHECK(v1_2.get_x() == 1.0);
+        CHECK(v1_2.get_y() == 7.25);
 
         pf::vector2d v1_3 = pf::separation(s, ds, boids[3], boids); 
-        CHECK(v1_3.get_x() == -5.0);
-        CHECK(v1_3.get_y() == -3.25);
+        CHECK(v1_3.get_x() == 3.0);
+        CHECK(v1_3.get_y() == -6.75);
     }
 
 
     SUBCASE("Testing the alignment rule"){
+
+         
+
         pf::vector2d v2_0 = pf::alignment(a, boids[0], boids); 
+        
         CHECK(v2_0.get_x() == doctest::Approx(0.3));
-        CHECK(v2_0.get_y() == doctest::Approx(0.767));
+        CHECK(v2_0.get_y() == doctest::Approx(0.766667));
 
 
         pf::vector2d v2_1 = pf::alignment(a, boids[1], boids); 
         CHECK(v2_1.get_x() == doctest::Approx(-0.5));
-        CHECK(v2_1.get_y() == doctest::Approx(-0.167));
+        CHECK(v2_1.get_y() == doctest::Approx(-0.166667));
 
         pf::vector2d v2_2 = pf::alignment(a, boids[2], boids); 
-        CHECK(v2_2.get_x() == doctest::Approx(-0.233));
-        CHECK(v2_2.get_y() == doctest::Approx(0.233));
+        CHECK(v2_2.get_x() == doctest::Approx(-0.233333));
+        CHECK(v2_2.get_y() == doctest::Approx(0.233333));
 
         pf::vector2d v2_3 = pf::alignment(a, boids[3], boids); 
-        CHECK(v2_3.get_x() == doctest::Approx(0.433));
-        CHECK(v2_3.get_y() == doctest::Approx(-0.833));
+        CHECK(v2_3.get_x() == doctest::Approx(0.433333));
+        CHECK(v2_3.get_y() == doctest::Approx(-0.833333));
 
 
     }
+
+    
   
     SUBCASE("Testing the centre of mass"){
         pf::vector2d v3_0 = pf::cohesion(c, boids[0], boids); 
@@ -182,14 +196,34 @@ TEST_CASE("Testing the statistic function"){
     boids[3].speed.set_y(3.0);
 
     pf::Statistics results = pf::statistics(boids); 
-    CHECK (results.mean_distance == doctest::Approx(6.71191)); 
-    CHECK (results.mean_speed == doctest::Approx(3.0587));
-    CHECK (results.dev_distance == doctest::Approx(1.13576));   //DEVIAZIONE STANDARD CAMPIONARIA
-    CHECK (results.dev_speed == doctest::Approx(0.83215)); 
+    CHECK (results.mean_distance == doctest::Approx(5.95184)); 
+    CHECK (results.mean_speed == doctest::Approx(3.34927));
+    CHECK (results.dev_mean_distance == doctest::Approx(0.68807).epsilon(0.00001));   
+    CHECK (results.dev_mean_speed == doctest::Approx(0.229).epsilon(0.001)); 
  
-
-
-
 }
 
-//CONTROLLO CHE LE FUNZIONI NON POSSANO OPERARE SUI NON VICINI!!!!
+TEST_CASE("Testing the Weiestrass function"){
+    std::vector<pf::boid> boids(2);
+
+
+    boids[0].position.set_x(45.0);
+    boids[0].position.set_y(1.0);
+    boids[1].position.set_x(0.0);
+    boids[1].position.set_y(-90.0);
+
+
+    boids[0].speed.set_x(2.0);
+    boids[0].speed.set_y(-1.0);
+    boids[1].speed.set_x(-1.3);
+    boids[1].speed.set_y(0.6);
+
+    pf::Weierstrass(boids[0], 40, 80);
+    pf::Weierstrass(boids[1], 40, 80);
+    CHECK (boids[0].speed.get_x() == -2.0);
+    CHECK (boids[0].speed.get_y() == -1.0);
+    CHECK (boids[1].speed.get_x() == -1.3);
+    CHECK (boids[1].speed.get_y() == -0.6);
+
+   
+}
