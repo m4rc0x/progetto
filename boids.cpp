@@ -1,19 +1,13 @@
 #include <cassert>
 #include <cmath>
 #include <random>
-#include <vector>
 #include <stdexcept>
 
 #include "boids.hpp"
 
-// #include <stdexpet> per introdurre throw std::runtime_error (vedi data
-// abstraction) cerr e .what()
+namespace pj {
 
-namespace pf {
-
-vector2d::vector2d(double x, double y) : x_{x}, y_{y} {  // l'assert si deve trovare alla fine del costruttore o all'inizio di un metodo
-  
-  }  // quando l'assert non è verificato, utilizzare l'istruzione terminate
+vector2d::vector2d(double x, double y) : x_{x}, y_{y} {  } 
 double vector2d::get_x() const { return x_;}  
 double vector2d::get_y() const { return y_; }
 void vector2d::set_x(double x) { x_ = x; }  
@@ -22,13 +16,6 @@ double vector2d::norm() const {
   return std::sqrt(x_ * x_ + y_ * y_);
 }
 
-// metodi per operazioni vettoriali: somma e prodotto scalare
-// assert(std::abs(x_) < 40.0 && std::abs(y_) < 30;
-
-/*if(std::abs(x_) < 40.0){
-    throw std::runtime_error
-}
-//griglia 80 x 60, condizioni di range per x e y */
 
 vector2d operator+(vector2d const &v1, vector2d const &v2) { 
 
@@ -47,50 +34,50 @@ vector2d operator-(vector2d const &v1, vector2d const &v2) {
   return v;
 }
 
-vector2d operator*(vector2d &v, double f) {       //prodotto di un vettore per uno scalare
+vector2d operator*(vector2d &v, double f) {       
   v.set_x(v.get_x() * f);
   v.set_y(v.get_y() * f);
   return v;
 }
 
-bool operator!=(vector2d const &v1, vector2d const &v2) {  // controlla bj != bi
+bool operator!=(vector2d const &v1, vector2d const &v2) {  
   return (v1.get_x() != v2.get_x()) || (v1.get_y() != v2.get_y());
 }
 
-void fill(std::vector<boid> &b, double range_x, double range_y, double sx, double sy) {
+void fill(std::vector<boid> &flock, double range_px, double range_py, double range_sx, double range_sy) {
 
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  std::uniform_real_distribution<> dis1(-(range_x / 8), (range_x / 8));
-  for (auto &it : b) {
-    it.position.set_x(dis1(gen));
+  std::uniform_real_distribution<> dis1(-(range_px / 10), (range_px / 10));
+  for (auto &it : flock) {
+    it.position_.set_x(dis1(gen));
   }
 
-  std::uniform_real_distribution<> dis2(-(range_y / 8), (range_y / 8));
-  for (auto &it : b) {  
-    it.position.set_y(dis2(gen));
+  std::uniform_real_distribution<> dis2(-(range_py / 10), (range_py / 10));
+  for (auto &it : flock) {  
+    it.position_.set_y(dis2(gen));
   }
 
-  std::uniform_real_distribution<> dis3(-sx, sx);
-  for (auto &it : b) {
-    it.speed.set_x(dis3(gen));
+  std::uniform_real_distribution<> dis3(-range_sx / 5, range_sx / 5);
+  for (auto &it : flock) {
+    it.speed_.set_x(dis3(gen));
   }
 
-  std::uniform_real_distribution<> dis4(-sy, sy);
-  for (auto &it : b) {
-    it.speed.set_y(dis4(gen));
+  std::uniform_real_distribution<> dis4(-range_sy / 5, range_sy / 5);
+  for (auto &it : flock) {
+    it.speed_.set_y(dis4(gen));
   }
 }
 
-std::vector<boid> near_boids(std::vector<boid> const &b, double d, boid const &b_i) {
+std::vector<boid> near_boids(std::vector<boid> const &boids, double d, boid const &boid_i) {
   std::vector<boid> near;
-  vector2d b_ij;
-  for (auto &b_j : b) {
-    b_ij = b_i.position - b_j.position;
+  vector2d boid_ij;
+  for (auto &boid_j : boids) {
+    boid_ij = boid_i.position_ - boid_j.position_;
 
-    if (b_ij.norm() < d) {
-      near.push_back(b_j);
+    if (boid_ij.norm() < d) {
+      near.push_back(boid_j);
     }
   }
   if(near.size() < 2){
@@ -99,96 +86,92 @@ std::vector<boid> near_boids(std::vector<boid> const &b, double d, boid const &b
   return near;
 }
 
-vector2d speed_now(vector2d &v, vector2d const &v1, vector2d const &v2, vector2d const &v3) {
-  v = v + v1;
-  v = v + v2;
-  v = v + v3;
+vector2d speed_now(vector2d &sp, vector2d const &sp1, vector2d const &sp2, vector2d const &sp3) {
+  sp = sp + sp1;
+  sp = sp + sp2;
+  sp = sp + sp3;
   
-  return v;
+  return sp;
 }
 
-vector2d position_now(vector2d &s, vector2d &v, double delta_t) {
-  vector2d delta_p = v * (1 / delta_t);  
-  s = s + delta_p;
+vector2d position_now(vector2d &pos, vector2d &sp, double delta_t) {
+  vector2d delta_pos = sp * (1 / delta_t);  
+  pos = pos + delta_pos;
 
-  return s;
+  return pos;
 }
 
-vector2d separation(double s, double ds, boid const &b, std::vector<boid> const &near) {
-  vector2d v1{0., 0.};
-    vector2d delta_s{0., 0.};
-  for (auto b1 : near) {
-      delta_s = b.position - b1.position;
+vector2d separation(double s, double ds, boid const &boid_i, std::vector<boid> const &near) {
+  vector2d sp1{0., 0.};
+  vector2d delta_p{0., 0.};
+  for (auto boid_j : near) {
+      delta_p = boid_i.position_ - boid_j.position_;
 
-    if (delta_s.norm() < ds) {
-          v1 = v1 + delta_s; 
+    if (delta_p.norm() < ds) {
+          sp1 = sp1 + delta_p; 
     }
   }
-  v1 = v1 * (-s);
-  return v1;
+  return sp1 * (-s);
 }
 
-vector2d alignment(double a, boid const &b, std::vector<boid> const &near) {
-  vector2d v2{0., 0.};
-  for (auto b1 : near) {
-    if (b1.speed != b.speed) {
-      v2 = v2 + b1.speed;
+vector2d alignment(double a, boid const &boid_i, std::vector<boid> const &near) {
+  vector2d sp2{0., 0.};
+  for (auto boid_j : near) {
+    if (boid_j.speed_ != boid_i.speed_) {
+      sp2 = sp2 + boid_j.speed_;
     }
   }
  
-  v2 = v2 * (1 / (static_cast<double>(near.size()) - 1));
-  v2 = v2 - b.speed;
-  v2 = v2 * a;
-
-  return v2;
+  sp2 = sp2 * (1 / (static_cast<double>(near.size()) - 1));
+  sp2 = sp2 - boid_i.speed_;
+  return sp2 * a;
 }
 
-vector2d cohesion(double c, boid const &b, std::vector<boid> const &near) {
-  vector2d x_cm{0., 0.};
-  for (auto b1 : near) {
-    if (b1.speed != b.speed) {
-      x_cm = x_cm + b1.position;
+vector2d cohesion(double c, boid const &boid_i, std::vector<boid> const &near) {
+  vector2d pos_cm{0., 0.};
+  for (auto boid_j : near) {
+    if (boid_j.speed_ != boid_i.speed_) {
+      pos_cm = pos_cm + boid_j.position_;
     }
   }
-  x_cm = x_cm * (1 / static_cast<double>((near.size()) - 1));
-  vector2d v3 = x_cm - b.position;
-  v3 = v3 * c;
-  return v3;
+  pos_cm = pos_cm * (1 / static_cast<double>((near.size()) - 1));
+  vector2d sp3 = pos_cm - boid_i.position_;
+  return sp3 * c;
 }
 
-void Weierstrass(boid &b_e, double range_x, double range_y) {
+void pacman(boid &boid_ext, double range_px, double range_py) {
   
-  if (std::abs(b_e.position.get_x()) > (range_x / 2 - 1)) {
-    b_e.speed.set_x(b_e.speed.get_x() * (-1));
+  if (std::abs(boid_ext.position_.get_x()) > (range_px / 2)) {
+    boid_ext.position_.set_x(std::copysign(range_px / 2, boid_ext.position_.get_x() * (-1)));
+
   }
 
-  if (std::abs(b_e.position.get_y()) > (range_y / 2 - 1)) {
-    b_e.speed.set_y(b_e.speed.get_y() * (-1));
+  if (std::abs(boid_ext.position_.get_y()) > (range_py / 2)) {
+    boid_ext.position_.set_y(std::copysign(range_py / 2, boid_ext.position_.get_y() * -1));
   }
 
   
 }
 
-Statistics statistics(std::vector<boid> const &boids) {  
+Statistics statistics(std::vector<boid> const &flock) {  
 
-  
   double sum_distance{};
   double sum_speed{};
   double sum_distance2{};
   double sum_speed2{};
-  long unsigned int size = boids.size(); 
+  long unsigned int size = flock.size(); 
   long unsigned int n = size * (size - 1) / 2; 
 
-  auto it1 = boids.begin();
-  for (; it1 != boids.end(); ++it1) {
-    sum_speed += it1->speed.norm();  // accumula i moduli delle velocità 
-    sum_speed2 += std::pow(it1->speed.norm(),2);
+  auto it1 = flock.begin();
+  for (; it1 != flock.end(); ++it1) {
+    sum_speed += it1->speed_.norm();  // accumula i moduli delle velocità 
+    sum_speed2 += std::pow(it1->speed_.norm(),2);
 
     auto it2 = it1 + 1;
 
-    for (; it2 != boids.end(); ++it2) {
-      sum_distance += (it1->position - it2->position).norm();       
-      sum_distance2 += std::pow((it1->position - it2->position).norm(), 2);
+    for (; it2 != flock.end(); ++it2) {
+      sum_distance += (it1->position_ - it2->position_).norm();       
+      sum_distance2 += std::pow((it1->position_ - it2->position_).norm(), 2);
     }
     
   }

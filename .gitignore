@@ -9,6 +9,7 @@ boids
 boids.t
 gitignore.txt
 gitignore.txt:Zone.Identifier
+progetto/
 =======
 # Prerequisites
 *.d

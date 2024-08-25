@@ -1,7 +1,6 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
-#include <random>
 #include <vector>
 
 #include "boids.hpp"
@@ -16,74 +15,83 @@ int main() {
   double c;
   double time;
 
-  std::cout << "Insert parameters n, d, ds, s, a, c, time  \n";
+  std::cout << "Our program simulates the evolution of a flock according to the boids model\n" << 
+  "Mathematical rules that repeatedly define boids' speed and position are based of the following parameters:\n" <<
+  "n: number of boids (suggested range: 50-500)\n"  <<
+  "d: distance of near boids expressed in metres  \n" <<
+  "ds: distance used for the separation rule expressed in metres (upper bound d/10 \n" << 
+  "s: factor of separation (upper bound: 0.5) \n" << 
+  "a: factor of alignment (upper bound: 0.5) \n" << 
+  "c: factor of cohesion (upper bound: 0.5) \n" <<
+  "time: duration of the simulation expressed in seconds\n" <<
+  "Please insert them\n"; 
   std::cin >> n >> d >> ds >> s >> a >> c >> time;
+  assert (n > 9);
+  assert (ds < d/10); 
+  assert (s > 0 && s < 1);
+  assert (s > 0 && s < 1);
 
-  // condizioni di posizione e velocita
-  const double range_x{80.0};
-  const double range_y{80.0};
-  const double sx_max{5.0};
-  const double sy_max{5.0};
+   
 
-  std::vector<pf::boid> boids(n);
+
+  // condizioni massime di posizione e velocità
+  const double range_px{1000.0};
+  const double range_py{1000.0};
+  const double range_sx{50.0};
+  const double range_sy{50.0};
+
+  //vettore dello stormo
+  std::vector<pj::boid> flock(n);   
 
   // generazione di numeri pseudocasuali
-  pf::fill(boids, range_x, range_y, sx_max, sy_max);
-  /*
-  for (std::size_t i{0}; i != n; ++i){
-    std::cout << " px: " << boids[i].position.get_x() << '\n'; 
-    std::cout << " py: " << boids[i].position.get_y() << '\n'; 
-    std::cout << " sx: " << boids[i].speed.get_x() << '\n'; 
-    std::cout << " sy: " << boids[i].speed.get_y() << '\n'; 
-  }
-  */
-  // near boids
-  std::vector<std::vector<pf::boid>> all_near(n);  // NO VETTORE DI VETTORI
+  pj::fill(flock, range_px, range_py, range_sx, range_sy);
+  
+  //il vettore accumula le informazioni relative ai boids vicini 
+  std::vector<std::vector<pj::boid>> all_near(n);  
 
-  // std::cout <<
-  // auto t0 = std::chrono::system_clock::now();
+  //velocità per le regole
+  pj::vector2d speed1{0., 0.}; 
+  pj::vector2d speed2{0., 0.};
+  pj::vector2d speed3{0., 0.};
+  pj::vector2d speed{0., 0.};
+  pj::vector2d position{0., 0.};
 
-  pf::vector2d v1{0., 0.};;     
-  pf::vector2d v2{0., 0.};
-  pf::vector2d v3{0., 0.};
-  pf::vector2d v{0., 0.};
-  pf::vector2d p{0., 0.};
+  //il vettore raccoglie i dati statistici ad ogni unità di tempo 
+  std::vector<pj::Statistics> result;
 
-  std::vector<pf::Statistics> result;
-  /* std::cout << all_near.size() << "\n";
-   std::cout << boids.size() << "\n";  */
-
+  //il ciclo compie un numero di iterazioni pari al valore di time 
   for (long unsigned int i{0}; i < static_cast<long unsigned int>(time); ++i) {
     auto it1 = all_near.begin();
     auto it2 = all_near.end();
-    auto it = boids.begin();
+    auto it = flock.begin();
 
     for (; it1 != it2; ++it1, ++it) {
       
-      (*it1) = pf::near_boids(boids, d, *it);
+      (*it1) = pj::near_boids(flock, d, *it);
 
-      v1 = pf::separation(s, ds, *it, *it1); //MODIFICATO
-      v2 = pf::alignment(a, *it, *it1);
-      v3 = pf::cohesion(c, *it, *it1);
+      //ad ogni iterazione vengono aggiornate le posizioni e le velocità dei boids
+      speed1 = pj::separation(s, ds, *it, *it1); 
+      speed2 = pj::alignment(a, *it, *it1);
+      speed3 = pj::cohesion(c, *it, *it1);
 
-      v = pf::speed_now(it->speed, v1, v2, v3); 
-      p = pf::position_now(it->position, v, 1);
+      speed = pj::speed_now(it->speed_, speed1, speed2, speed3); 
+      position = pj::position_now(it->position_, speed, 1);
 
-      pf::Weierstrass(*it, range_x, range_y);
+      pj::pacman(*it, range_px, range_py);
       
-      //assert(v.norm() < .0); 
-      assert(std::abs(p.get_x()) < range_x / 2);
-      assert(std::abs(p.get_y()) < range_y / 2);
+      assert(std::abs(position.get_x()) < range_px / 2);
+      assert(std::abs(position.get_y()) < range_py / 2);
+      assert(std::abs(speed.get_x()) < range_sx / 2);
+      assert(std::abs(speed.get_y()) < range_sy / 2);
 
+    
 
-      
-      it->position = p;   //MODIFICATO
-      it->speed = v;
+      it->position_ = position;   
+      it->speed_ = speed;
     
     }
-
-    result.push_back(pf::statistics(boids));
-    std::cout << "mean distance:" << result[i].mean_distance << "+-" << result[i].dev_mean_distance << 
-    "    mean speed:" << result[i].mean_speed << "+-" << result[i].dev_mean_speed << "\n";
+    result.push_back(pj::statistics(flock));
+    std::cout << "mean distance:" << result[i].mean_distance << "+-" << result[i].dev_mean_distance << " m"
+    "    mean speed:" << result[i].mean_speed << "+-" << result[i].dev_mean_speed << " m/s\n";
   }
 }
