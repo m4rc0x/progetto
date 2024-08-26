@@ -26,13 +26,11 @@ int main() {
   "time: duration of the simulation expressed in seconds\n" <<
   "Please insert them\n"; 
   std::cin >> n >> d >> ds >> s >> a >> c >> time;
-  assert (n > 9);
+  assert (n > 2);     //nan con n = 2
   assert (ds < d/10); 
   assert (s > 0 && s < 1);
-  assert (s > 0 && s < 1);
-
-   
-
+  assert (a > 0 && a < 1);
+  assert (c > 0 && c < 1);
 
   // condizioni massime di posizione e velocità
   const double range_px{1000.0};
@@ -79,10 +77,10 @@ int main() {
 
       pj::pacman(*it, range_px, range_py);
       
-      assert(std::abs(position.get_x()) < range_px / 2);
-      assert(std::abs(position.get_y()) < range_py / 2);
-      assert(std::abs(speed.get_x()) < range_sx / 2);
-      assert(std::abs(speed.get_y()) < range_sy / 2);
+      assert(std::abs(position.get_x()) <= range_px / 2);
+      assert(std::abs(position.get_y()) <= range_py / 2);
+      assert(std::abs(speed.get_x()) <= range_sx / 2);
+      assert(std::abs(speed.get_y()) <= range_sy / 2);
 
     
 

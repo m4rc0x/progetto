@@ -19,34 +19,25 @@ double vector2d::norm() const {
 
 vector2d operator+(vector2d const &v1, vector2d const &v2) { 
 
-  vector2d v;
-  v.set_x(v1.get_x() + v2.get_x());
-  v.set_y(v1.get_y() + v2.get_y());
-
-  return v;
+  return vector2d{v1.get_x() + v2.get_x(), v1.get_y() + v2.get_y()}; 
 }
 
 vector2d operator-(vector2d const &v1, vector2d const &v2) {
-  vector2d v;
-  v.set_x(v1.get_x() - v2.get_x());
-  v.set_y(v1.get_y() - v2.get_y());
 
-  return v;
+  return vector2d{v1.get_x() - v2.get_x(), v1.get_y() - v2.get_y()};
 }
 
 vector2d operator*(vector2d &v, double f) {       
-  v.set_x(v.get_x() * f);
-  v.set_y(v.get_y() * f);
-  return v;
+  return vector2d{v.get_x() * f, v.get_y() * f};
 }
 
 bool operator!=(vector2d const &v1, vector2d const &v2) {  
   return (v1.get_x() != v2.get_x()) || (v1.get_y() != v2.get_y());
 }
 
-void fill(std::vector<boid> &flock, double range_px, double range_py, double range_sx, double range_sy) {
+void fill(std::vector<boid> &flock, double range_px, double range_py, double range_sx, double range_sy) { //NON SONO NECESSARIE 4 DISTRIBUZIONI!
 
-  std::random_device rd;
+  std::random_device rd;  //RIVEDI 
   std::mt19937 gen(rd());
 
   std::uniform_real_distribution<> dis1(-(range_px / 10), (range_px / 10));
