@@ -35,6 +35,11 @@ bool operator!=(vector2d const &v1, vector2d const &v2) {
   return (v1.get_x() != v2.get_x()) || (v1.get_y() != v2.get_y());
 }
 
+bool operator>(vector2d const &v1, vector2d const &v2) {  
+  return (v1.get_x() < v2.get_x()) || (v1.get_y() != v2.get_y());
+}
+
+
 //operatore per accumulare le velocità
   pj::vector2d operator+=(pj::vector2d &v1, pj::vector2d const &v2){
   v1.set_x(v1.get_x() + v2.get_x());
@@ -79,7 +84,7 @@ std::vector<boid> near_boids(std::vector<boid> const &boids, double d, boid cons
     }
   }
   if(near.size() < 2){
-    throw std::runtime_error("not enough near boids to define some operations");
+    throw std::runtime_error{"not enough near boids to define some operations"};
   }
   return near;
 }
@@ -144,7 +149,7 @@ void pacman(boid &boid_ext, double range_px, double range_py) {
   if (std::abs(boid_ext.position_.get_x()) > (range_px / 2)) {
     boid_ext.position_.set_x(std::copysign(range_px / 2, boid_ext.position_.get_x() * (-1)));
 
-  }
+}
 
   if (std::abs(boid_ext.position_.get_y()) > (range_py / 2)) {
     boid_ext.position_.set_y(std::copysign(range_py / 2, boid_ext.position_.get_y() * -1));

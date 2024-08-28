@@ -20,9 +20,9 @@ int main() {
   "n: number of boids (lower bound: 3, suggested range: 20-1000)\n"  <<
   "d: distance of near boids expressed in metres (suggested a value greater than n)\n" <<
   "ds: distance used for the separation rule expressed in metres (positive number lower than d \n" << 
-  "s: factor of separation (allowed range: [0, 1], suggested range : [0, 0.5]) \n" << 
-  "a: factor of alignment (allowed range: [0, 1], suggested range : [0, 0.5]) \n" <<  
-  "c: factor of cohesion (allowed range: [0, 1], suggested range : [0, 0.5]) \n" <<
+  "s: factor of separation (allowed range: [0,1], suggested range : [0, 0.2]) \n" << 
+  "a: factor of alignment (allowed range: [0,1], suggested range : [0, 0.2]) \n" <<  
+  "c: factor of cohesion (allowed range: [0,1], suggested range : [0, 0.2]) \n" <<
   "time: duration of the simulation expressed in seconds\n" <<
   "Please insert them\n"; 
   std::cin >> n >> d >> ds >> s >> a >> c >> time;
@@ -76,22 +76,23 @@ int main() {
 
       speed = pj::speed_now(it->speed_, speed1, speed2, speed3); 
       position = pj::position_now(it->position_, speed, 1);
-
-      pj::pacman(*it, range_px, range_py);
       
-      assert(std::abs(position.get_x()) <= range_px / 2);
-      assert(std::abs(position.get_y()) <= range_py / 2);
-      assert(std::abs(speed.get_x()) <= range_sx);
-      assert(std::abs(speed.get_y()) <= range_sy);
+      pj::pacman(*it, range_px, range_py);
 
-    
-
+      if(std::abs(position.get_x()) > range_px  / 2 || std::abs(position.get_y()) > range_py / 2){
+        throw std::runtime_error{"Boundaries have been crossed"};
+      }
+      
+      if(speed.get_x() > range_sx || speed.get_y() > range_sy){
+        throw std::runtime_error{"Speed limit reached "};
+      }
+          
       it->position_ = position;   
       it->speed_ = speed;
     
     }
     result.push_back(pj::statistics(flock));
-      std::cout << "mean distance:" << result[i].mean_distance << "+-" << result[i].dev_mean_distance << " m" //std::setprecision()
-    "    mean speed:" << result[i].mean_speed << "+-" << result[i].dev_mean_speed << " m/s\n";
+      std::cout << "mean distance:(" << result[i].mean_distance << "+-" << result[i].dev_mean_distance << ") m" //st>d::setprecision()
+    "    mean speed: (" << result[i].mean_speed << "+-" << result[i].dev_mean_speed << ") m/s\n";
   }
 }
