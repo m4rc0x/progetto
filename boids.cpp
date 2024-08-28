@@ -7,13 +7,15 @@
 
 namespace pj {
 
-vector2d::vector2d(double x, double y) : x_{x}, y_{y} {  } 
+vector2d::vector2d(double x, double y) : x_{x}, y_{y} { 
+ } 
 double vector2d::get_x() const { return x_;}  
 double vector2d::get_y() const { return y_; }
 void vector2d::set_x(double x) { x_ = x; }  
 void vector2d::set_y(double y) { y_ = y; }
 double vector2d::norm() const { 
   return std::sqrt(x_ * x_ + y_ * y_);
+  
 }
 
 
@@ -85,19 +87,16 @@ std::vector<boid> near_boids(std::vector<boid> const &boids, double d, boid cons
 }
 
 vector2d speed_now(vector2d &sp, vector2d const &sp1, vector2d const &sp2, vector2d const &sp3) {
+  sp = sp + sp1 + sp2 + sp3; 
 
-  sp = sp + sp1;
-  sp = sp + sp2;
-  sp = sp + sp3;
-
-  
+  //assert(sp.get_x() < 200 && sp.get_y() < 200);
   return sp;
 }
 
 vector2d position_now(vector2d &pos, vector2d &sp, double delta_t) {
-  vector2d delta_pos = sp * (1 / delta_t);  
-  pos = pos + delta_pos;
+  pos = pos + (sp * (1 / delta_t));
 
+  //assert(pos.get_x() < 1000 && pos.get_y() < 1000); 
   return pos;
 }
 
@@ -122,9 +121,8 @@ vector2d alignment(double a, boid const &boid_i, std::vector<boid> const &near) 
     }
   }
  
-  sp2 = sp2 * (1 / (static_cast<double>(near.size()) - 1));
-  sp2 = sp2 - boid_i.speed_;
-  return sp2 * a;
+  sp2 = ((sp2 * (1 / (static_cast<double>(near.size()) - 1))) - boid_i.speed_);
+  return sp2 * a; 
 }
 
 vector2d cohesion(double c, boid const &boid_i, std::vector<boid> const &near) {
@@ -134,8 +132,7 @@ vector2d cohesion(double c, boid const &boid_i, std::vector<boid> const &near) {
       pos_cm = pos_cm + boid_j.position_;
     }
   }
-  pos_cm = pos_cm * (1 / static_cast<double>((near.size()) - 1));
-  vector2d sp3 = pos_cm - boid_i.position_;
+  vector2d sp3 = (pos_cm * (1 / static_cast<double>((near.size()) - 1)))- boid_i.position_;
   return sp3 * c;
 }
 

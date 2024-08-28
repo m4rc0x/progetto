@@ -50,10 +50,11 @@ int main() {
   std::vector<std::vector<pj::boid>> all_near(n);  
 
   //velocità per le regole
+
+  pj::vector2d speed{0., 0.};
   pj::vector2d speed1{0., 0.};
   pj::vector2d speed2{0., 0.};
   pj::vector2d speed3{0., 0.};
-  pj::vector2d speed{0., 0.};
   pj::vector2d position{0., 0.};
 
   //il vettore raccoglie i dati statistici ad ogni unità di tempo 

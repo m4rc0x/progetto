@@ -7,7 +7,6 @@
 
 TEST_CASE("Testing the near boids function"){
 
- 
 
     std::vector<pj::boid> flock(8); 
     long unsigned int i{0};
@@ -19,27 +18,27 @@ TEST_CASE("Testing the near boids function"){
 
     }
     pj::boid boid_i = flock[3];
-    std::vector<pj::boid> n = pj::near_boids(flock, 15, boid_i);
+    std::vector<pj::boid> near = pj::near_boids(flock, 15, boid_i);
     
     SUBCASE ("Testing the correct number of near ones"){
-        CHECK(n.size() == 4); 
+        CHECK(near.size() == 4); 
     }
 
-    SUBCASE("Testing the exception"){
+    SUBCASE("Testing the exception with a short distance"){
         CHECK_THROWS(pj::near_boids(flock, 1, boid_i));
     }
 
     SUBCASE("Testing the correct estimation of near boids"){
     
 
-        CHECK(n[0].position_.get_x() == 5); 
-        CHECK(n[0].position_.get_y() == 5); 
-        CHECK(n[1].position_.get_x() == 10); 
-        CHECK(n[1].position_.get_y() == 10); 
-        CHECK(n[2].position_.get_x() == 20); 
-        CHECK(n[2].position_.get_y() == 20); 
-        CHECK(n[3].position_.get_x() == 25); 
-        CHECK(n[3].position_.get_y() == 25);
+        CHECK(near[0].position_.get_x() == 5); 
+        CHECK(near[0].position_.get_y() == 5); 
+        CHECK(near[1].position_.get_x() == 10); 
+        CHECK(near[1].position_.get_y() == 10); 
+        CHECK(near[2].position_.get_x() == 20); 
+        CHECK(near[2].position_.get_y() == 20); 
+        CHECK(near[3].position_.get_x() == 25); 
+        CHECK(near[3].position_.get_y() == 25);
 
     }
 }
@@ -151,7 +150,7 @@ TEST_CASE("Testing speed rules functions"){
 
     
   
-    SUBCASE("Testing the centre of mass"){
+    SUBCASE("Testing the cohesion rule"){
         pj::vector2d v3_0 = pj::cohesion(c, flock[0], flock); 
         CHECK(v3_0.get_x() == doctest::Approx(1.0));
         CHECK(v3_0.get_y() == doctest::Approx(0.45));
@@ -168,8 +167,28 @@ TEST_CASE("Testing speed rules functions"){
         CHECK(v3_3.get_x() == doctest::Approx(0.6));
         CHECK(v3_3.get_y() == doctest::Approx(-1.35));
     }
+
+   
 }
 
+TEST_CASE("Testing the pacman function"){
+    std::vector<pj::boid> flock(2);
+
+
+    flock[0].position_.set_x(600.0);
+    flock[0].position_.set_y(1.0);
+    flock[1].position_.set_x(0.0);
+    flock[1].position_.set_y(-900.0);
+
+    pj::pacman(flock[0], 1000, 1000);
+    pj::pacman(flock[1], 1000, 1000);
+    CHECK (flock[0].position_.get_x() == -500.0);
+    CHECK (flock[0].position_.get_y() == 1.0);
+    CHECK (flock[1].position_.get_x() == 0.0);
+    CHECK (flock[1].position_.get_y() == 500.0);
+
+   
+}
 
 TEST_CASE("Testing the statistic function"){
 
@@ -201,21 +220,4 @@ TEST_CASE("Testing the statistic function"){
  
 }
 
-TEST_CASE("Testing the pacman function"){
-    std::vector<pj::boid> flock(2);
 
-
-    flock[0].position_.set_x(600.0);
-    flock[0].position_.set_y(1.0);
-    flock[1].position_.set_x(0.0);
-    flock[1].position_.set_y(-900.0);
-
-    pj::pacman(flock[0], 1000, 1000);
-    pj::pacman(flock[1], 1000, 1000);
-    CHECK (flock[0].position_.get_x() == -500.0);
-    CHECK (flock[0].position_.get_y() == 1.0);
-    CHECK (flock[1].position_.get_x() == 0.0);
-    CHECK (flock[1].position_.get_y() == 500.0);
-
-   
-}
