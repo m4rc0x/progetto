@@ -23,7 +23,10 @@ namespace pj{
 vector2d operator+(vector2d const&, vector2d const&);
 vector2d operator-(vector2d const&, vector2d const&);
 vector2d operator*(vector2d &, double);
+vector2d operator+=(vector2d const&, vector2d const& );
 bool operator!=(vector2d const&, vector2d const&);
+
+
 
  struct boid{
     vector2d position_;

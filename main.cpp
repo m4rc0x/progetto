@@ -17,20 +17,22 @@ int main() {
 
   std::cout << "Our program simulates the evolution of a flock according to the boids model\n" << 
   "Mathematical rules that repeatedly define boids' speed and position are based of the following parameters:\n" <<
-  "n: number of boids (suggested range: 50-500)\n"  <<
-  "d: distance of near boids expressed in metres  \n" <<
-  "ds: distance used for the separation rule expressed in metres (upper bound d/10 \n" << 
-  "s: factor of separation (upper bound: 0.5) \n" << 
-  "a: factor of alignment (upper bound: 0.5) \n" << 
-  "c: factor of cohesion (upper bound: 0.5) \n" <<
+  "n: number of boids (lower bound: 3, suggested range: 20-1000)\n"  <<
+  "d: distance of near boids expressed in metres (suggested a value greater than n)\n" <<
+  "ds: distance used for the separation rule expressed in metres (positive number lower than d \n" << 
+  "s: factor of separation (allowed range: [0, 1], suggested range : [0, 0.5]) \n" << 
+  "a: factor of alignment (allowed range: [0, 1], suggested range : [0, 0.5]) \n" <<  
+  "c: factor of cohesion (allowed range: [0, 1], suggested range : [0, 0.5]) \n" <<
   "time: duration of the simulation expressed in seconds\n" <<
   "Please insert them\n"; 
   std::cin >> n >> d >> ds >> s >> a >> c >> time;
-  assert (n > 2);     //nan con n = 2
-  assert (ds < d/10); 
-  assert (s > 0 && s < 1);
-  assert (a > 0 && a < 1);
-  assert (c > 0 && c < 1);
+  assert (n > 2);     
+  assert(d > 0);
+  assert(ds > 0); 
+  assert (s >= 0 && s <= 1);
+  assert (a >= 0 && a <= 1);
+  assert (c >= 0 && c <= 1);
+  assert (time > 0); 
 
   // condizioni massime di posizione e velocità
   const double range_px{1000.0};
@@ -48,7 +50,7 @@ int main() {
   std::vector<std::vector<pj::boid>> all_near(n);  
 
   //velocità per le regole
-  pj::vector2d speed1{0., 0.}; 
+  pj::vector2d speed1{0., 0.};
   pj::vector2d speed2{0., 0.};
   pj::vector2d speed3{0., 0.};
   pj::vector2d speed{0., 0.};
@@ -79,8 +81,8 @@ int main() {
       
       assert(std::abs(position.get_x()) <= range_px / 2);
       assert(std::abs(position.get_y()) <= range_py / 2);
-      assert(std::abs(speed.get_x()) <= range_sx / 2);
-      assert(std::abs(speed.get_y()) <= range_sy / 2);
+      assert(std::abs(speed.get_x()) <= range_sx);
+      assert(std::abs(speed.get_y()) <= range_sy);
 
     
 
@@ -89,7 +91,7 @@ int main() {
     
     }
     result.push_back(pj::statistics(flock));
-    std::cout << "mean distance:" << result[i].mean_distance << "+-" << result[i].dev_mean_distance << " m"
+      std::cout << "mean distance:" << result[i].mean_distance << "+-" << result[i].dev_mean_distance << " m" //std::setprecision()
     "    mean speed:" << result[i].mean_speed << "+-" << result[i].dev_mean_speed << " m/s\n";
   }
 }

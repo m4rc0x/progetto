@@ -35,39 +35,46 @@ bool operator!=(vector2d const &v1, vector2d const &v2) {
   return (v1.get_x() != v2.get_x()) || (v1.get_y() != v2.get_y());
 }
 
-void fill(std::vector<boid> &flock, double range_px, double range_py, double range_sx, double range_sy) { //NON SONO NECESSARIE 4 DISTRIBUZIONI!
+//operatore per accumulare le velocità
+  pj::vector2d operator+=(pj::vector2d &v1, pj::vector2d const &v2){
+  v1.set_x(v1.get_x() + v2.get_x());
+  v1.set_y(v1.get_y() + v2.get_y());
+  return v1; 
+}
 
-  std::random_device rd;  //RIVEDI 
+
+void fill(std::vector<boid> &flock, double range_px, double range_py, double range_sx, double range_sy) { 
+
+  std::random_device rd;  
   std::mt19937 gen(rd());
 
   std::uniform_real_distribution<> dis1(-(range_px / 10), (range_px / 10));
-  for (auto &it : flock) {
-    it.position_.set_x(dis1(gen));
+  for (auto &boid : flock) {
+    boid.position_.set_x(dis1(gen));
   }
 
   std::uniform_real_distribution<> dis2(-(range_py / 10), (range_py / 10));
-  for (auto &it : flock) {  
-    it.position_.set_y(dis2(gen));
+  for (auto &boid : flock) {  
+    boid.position_.set_y(dis2(gen));
   }
 
   std::uniform_real_distribution<> dis3(-range_sx / 5, range_sx / 5);
-  for (auto &it : flock) {
-    it.speed_.set_x(dis3(gen));
+  for (auto &boid : flock) {
+    boid.speed_.set_x(dis3(gen));
   }
 
   std::uniform_real_distribution<> dis4(-range_sy / 5, range_sy / 5);
-  for (auto &it : flock) {
-    it.speed_.set_y(dis4(gen));
+  for (auto &boid : flock) {
+    boid.speed_.set_y(dis4(gen));
   }
 }
 
 std::vector<boid> near_boids(std::vector<boid> const &boids, double d, boid const &boid_i) {
   std::vector<boid> near;
-  vector2d boid_ij;
+  
   for (auto &boid_j : boids) {
-    boid_ij = boid_i.position_ - boid_j.position_;
-
-    if (boid_ij.norm() < d) {
+    
+    if (((boid_i.position_ - boid_j.position_).norm() < d) && (boid_i.position_ != boid_j.position_)) {
       near.push_back(boid_j);
     }
   }
@@ -78,9 +85,11 @@ std::vector<boid> near_boids(std::vector<boid> const &boids, double d, boid cons
 }
 
 vector2d speed_now(vector2d &sp, vector2d const &sp1, vector2d const &sp2, vector2d const &sp3) {
+
   sp = sp + sp1;
   sp = sp + sp2;
   sp = sp + sp3;
+
   
   return sp;
 }
@@ -99,7 +108,7 @@ vector2d separation(double s, double ds, boid const &boid_i, std::vector<boid> c
       delta_p = boid_i.position_ - boid_j.position_;
 
     if (delta_p.norm() < ds) {
-          sp1 = sp1 + delta_p; 
+          sp1 = sp1 + delta_p ; 
     }
   }
   return sp1 * (-s);
