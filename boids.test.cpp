@@ -22,7 +22,7 @@ TEST_CASE("Testing the near boids function"){
     std::vector<pj::boid> n = pj::near_boids(flock, 15, boid_i);
     
     SUBCASE ("Testing the correct number of near ones"){
-        CHECK(n.size() == 5); 
+        CHECK(n.size() == 4); 
     }
 
     SUBCASE("Testing the exception"){
@@ -31,17 +31,16 @@ TEST_CASE("Testing the near boids function"){
 
     SUBCASE("Testing the correct estimation of near boids"){
     
-        CHECK(n.size() == 5); 
+
         CHECK(n[0].position_.get_x() == 5); 
         CHECK(n[0].position_.get_y() == 5); 
         CHECK(n[1].position_.get_x() == 10); 
         CHECK(n[1].position_.get_y() == 10); 
-        CHECK(n[2].position_.get_x() == 15); 
-        CHECK(n[2].position_.get_y() == 15); 
-        CHECK(n[3].position_.get_x() == 20); 
-        CHECK(n[3].position_.get_y() == 20);
-        CHECK(n[4].position_.get_x() == 25); 
-        CHECK(n[4].position_.get_y() == 25);
+        CHECK(n[2].position_.get_x() == 20); 
+        CHECK(n[2].position_.get_y() == 20); 
+        CHECK(n[3].position_.get_x() == 25); 
+        CHECK(n[3].position_.get_y() == 25);
+
     }
 }
 

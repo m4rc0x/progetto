@@ -37,8 +37,8 @@ int main() {
   // condizioni massime di posizione e velocità
   const double range_px{1000.0};
   const double range_py{1000.0};
-  const double range_sx{50.0};
-  const double range_sy{50.0};
+  const double range_sx{200.0};
+  const double range_sy{200.0};
 
   //vettore dello stormo
   std::vector<pj::boid> flock(n);   
