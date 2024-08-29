@@ -5,6 +5,7 @@
 
 #include "boids.hpp"
 
+
 int main() {
   // parametri del modello di volo
   long unsigned int n;
@@ -52,9 +53,9 @@ int main() {
   //velocità per le regole
 
   pj::vector2d speed{0., 0.};
-  pj::vector2d speed1{0., 0.};
+  /*pj::vector2d speed1{0., 0.};
   pj::vector2d speed2{0., 0.};
-  pj::vector2d speed3{0., 0.};
+  pj::vector2d speed3{0., 0.};*/
   pj::vector2d position{0., 0.};
 
   //il vettore raccoglie i dati statistici ad ogni unità di tempo 
@@ -69,13 +70,13 @@ int main() {
     for (; it1 != it2; ++it1, ++it) {
       
       (*it1) = pj::near_boids(flock, d, *it);
-
+      speed = it->speed_;
       //ad ogni iterazione vengono aggiornate le posizioni e le velocità dei boids
-      speed1 = pj::separation(s, ds, *it, *it1); 
-      speed2 = pj::alignment(a, *it, *it1);
-      speed3 = pj::cohesion(c, *it, *it1);
+      speed = speed + pj::separation(s, ds, *it, *it1); 
+      speed = speed +  pj::alignment(a, *it, *it1);
+      speed = speed + pj::cohesion(c, *it, *it1);
 
-      speed = pj::speed_now(it->speed_, speed1, speed2, speed3); 
+      //speed = pj::speed_now(it->speed_, speed1, speed2, speed3); 
       position = pj::position_now(it->position_, speed, 1);
       
       pj::pacman(*it, range_px, range_py);

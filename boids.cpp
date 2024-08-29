@@ -38,11 +38,11 @@ bool operator!=(vector2d const &v1, vector2d const &v2) {
 }
 
 //operatore per accumulare le velocità
-  pj::vector2d operator+=(pj::vector2d &v1, pj::vector2d const &v2){
+/*vector2d operator+=(pj::vector2d &v1, pj::vector2d const &v2){
   v1.set_x(v1.get_x() + v2.get_x());
   v1.set_y(v1.get_y() + v2.get_y());
   return v1; 
-}
+}*/
 
 
 void fill(std::vector<boid> &flock, double range_px, double range_py, double range_sx, double range_sy) { 

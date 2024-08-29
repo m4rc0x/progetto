@@ -48,7 +48,7 @@ void fill (std::vector<boid>&, double, double, double, double);
 std::vector<boid> near_boids (std::vector<boid> const&, double, boid const&);
 
 //velocità e posizione ad ogni istante di tempo
-vector2d speed_now(vector2d&, vector2d const&, vector2d const&, vector2d const&);
+//vector2d speed_now(vector2d&, vector2d const&, vector2d const&, vector2d const&);
 vector2d position_now(vector2d& pos, vector2d &v, double const delta_t);
 
 //regole di velocità 

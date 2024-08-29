@@ -20,13 +20,8 @@ string(APPEND CMAKE_CXX_FLAGS
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -D_GLIBCXX_ASSERTIONS -fsanitize=address,undefined -fno-omit-frame-pointer")
 string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG " -fsanitize=address,undefined -fno-omit-frame-pointer")
 
-# richiedi il componente graphics della libreria SFML, versione 2.5
-#  le dipendenze vengono identificate automaticamente
-# find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
-
  add_executable(boids main.cpp boids.cpp)
-# target_link_libraries(mandelbrot PRIVATE sfml-graphics)
-
+ 
 # se il testing e' abilitato...
 #   per disabilitare il testing, passare -DBUILD_TESTING=OFF a cmake durante la fase di configurazione
 if (BUILD_TESTING)
