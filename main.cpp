@@ -19,7 +19,7 @@ int main() {
       << "Our program simulates the evolution of a flock according to the "
          "boids model\n"
       << "Mathematical rules that repeatedly define boids' speed and position "
-         "are based of the following parameters:\n"
+         "are based on the following parameters:\n"
       << "n: number of boids (lower bound: 3, suggested range: 100-1000)\n"
       << "d: distance of near boids expressed in metres (suggested at least "
          "100)\n"
