@@ -43,28 +43,6 @@ TEST_CASE("Testing the near boids function"){
     }
 }
 
-
-TEST_CASE("Testing speed_now function"){
-
-    pj::vector2d sp;
-    pj::vector2d sp1; 
-    pj::vector2d sp2;
-    pj::vector2d sp3;
-
-    sp.set_x(0.5);
-    sp.set_y(1.0);
-    sp1.set_x(2.0);
-    sp1.set_y(1.5);
-    sp2.set_x(-0.9);
-    sp2.set_y(5.4);
-    sp3.set_x(3.1);
-    sp3.set_y(-2.7);
-    sp = pj::speed_now(sp, sp1, sp2, sp3);
-
-    CHECK(sp.get_x() == 4.7); 
-    CHECK(sp.get_y() == 5.2); 
-}
-
 TEST_CASE("Testing position_now function"){
     pj::vector2d pos; 
     pj::vector2d sp;

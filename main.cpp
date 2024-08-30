@@ -18,9 +18,9 @@ int main() {
 
   std::cout << "Our program simulates the evolution of a flock according to the boids model\n" << 
   "Mathematical rules that repeatedly define boids' speed and position are based of the following parameters:\n" <<
-  "n: number of boids (lower bound: 3, suggested range: 20-1000)\n"  <<
-  "d: distance of near boids expressed in metres (suggested a value greater than n)\n" <<
-  "ds: distance used for the separation rule expressed in metres (positive number lower than d \n" << 
+  "n: number of boids (lower bound: 3, suggested range: 100-1000)\n"  <<
+  "d: distance of near boids expressed in metres (suggested at least 100)\n" <<
+  "ds: distance used for the separation rule expressed in metres (suggested range: [0, 1]) \n" << 
   "s: factor of separation (allowed range: [0,1], suggested range : [0, 0.2]) \n" << 
   "a: factor of alignment (allowed range: [0,1], suggested range : [0, 0.2]) \n" <<  
   "c: factor of cohesion (allowed range: [0,1], suggested range : [0, 0.2]) \n" <<
@@ -53,9 +53,6 @@ int main() {
   //velocità per le regole
 
   pj::vector2d speed{0., 0.};
-  /*pj::vector2d speed1{0., 0.};
-  pj::vector2d speed2{0., 0.};
-  pj::vector2d speed3{0., 0.};*/
   pj::vector2d position{0., 0.};
 
   //il vettore raccoglie i dati statistici ad ogni unità di tempo 
@@ -76,7 +73,6 @@ int main() {
       speed = speed +  pj::alignment(a, *it, *it1);
       speed = speed + pj::cohesion(c, *it, *it1);
 
-      //speed = pj::speed_now(it->speed_, speed1, speed2, speed3); 
       position = pj::position_now(it->position_, speed, 1);
       
       pj::pacman(*it, range_px, range_py);

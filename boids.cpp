@@ -37,37 +37,29 @@ bool operator!=(vector2d const &v1, vector2d const &v2) {
   return (v1.get_x() != v2.get_x()) || (v1.get_y() != v2.get_y());
 }
 
-//operatore per accumulare le velocità
-/*vector2d operator+=(pj::vector2d &v1, pj::vector2d const &v2){
-  v1.set_x(v1.get_x() + v2.get_x());
-  v1.set_y(v1.get_y() + v2.get_y());
-  return v1; 
-}*/
-
-
 void fill(std::vector<boid> &flock, double range_px, double range_py, double range_sx, double range_sy) { 
 
   std::random_device rd;  
-  std::mt19937 gen(rd());
+  std::default_random_engine eng(rd());
 
   std::uniform_real_distribution<> dis1(-(range_px / 10), (range_px / 10));
   for (auto &boid : flock) {
-    boid.position_.set_x(dis1(gen));
+    boid.position_.set_x(dis1(eng));
   }
 
   std::uniform_real_distribution<> dis2(-(range_py / 10), (range_py / 10));
   for (auto &boid : flock) {  
-    boid.position_.set_y(dis2(gen));
+    boid.position_.set_y(dis2(eng));
   }
 
   std::uniform_real_distribution<> dis3(-range_sx / 10, range_sx / 10);
   for (auto &boid : flock) {
-    boid.speed_.set_x(dis3(gen));
+    boid.speed_.set_x(dis3(eng));
   }
 
   std::uniform_real_distribution<> dis4(-range_sy / 10, range_sy / 10);
   for (auto &boid : flock) {
-    boid.speed_.set_y(dis4(gen));
+    boid.speed_.set_y(dis4(eng));
   }
 }
 
@@ -86,19 +78,7 @@ std::vector<boid> near_boids(std::vector<boid> const &boids, double d, boid cons
   return near;
 }
 
-vector2d speed_now(vector2d &sp, vector2d const &sp1, vector2d const &sp2, vector2d const &sp3) {
-  sp = sp + sp1 + sp2 + sp3; 
 
-  //assert(sp.get_x() < 200 && sp.get_y() < 200);
-  return sp;
-}
-
-vector2d position_now(vector2d &pos, vector2d &sp, double delta_t) {
-  pos = pos + (sp * (1 / delta_t));
-
-  //assert(pos.get_x() < 1000 && pos.get_y() < 1000); 
-  return pos;
-}
 
 vector2d separation(double s, double ds, boid const &boid_i, std::vector<boid> const &near) {
   vector2d sp1{0., 0.};
@@ -134,6 +114,13 @@ vector2d cohesion(double c, boid const &boid_i, std::vector<boid> const &near) {
   }
   vector2d sp3 = (pos_cm * (1 / static_cast<double>((near.size()) - 1)))- boid_i.position_;
   return sp3 * c;
+}
+
+vector2d position_now(vector2d &pos, vector2d &sp, double delta_t) {
+  pos = pos + (sp * (1 / delta_t));
+
+  assert(pos.get_x() < 1000 && pos.get_y() < 1000); 
+  return pos;
 }
 
 void pacman(boid &boid_ext, double range_px, double range_py) {
@@ -175,7 +162,7 @@ Statistics statistics(std::vector<boid> const &flock) {
     
   }
 
-  double mean_distance = sum_distance / static_cast<double>(n);   //calcolo della distanza media DELLO STORMO!
+  double mean_distance = sum_distance / static_cast<double>(n);   
   double mean_speed = sum_speed / static_cast<double>(size); 
   double dev_mean_distance =  std::sqrt(std::abs((sum_distance2 - static_cast<double>(n) * mean_distance * mean_distance)) / static_cast<double>((n - 1) * n));
   double dev_mean_speed = std::sqrt(std::abs((sum_speed2 - static_cast<double>(size) * mean_speed * mean_speed)) / static_cast<double>((size - 1) * size));
