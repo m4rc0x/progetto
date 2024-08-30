@@ -76,7 +76,7 @@ vector2d separation(double s, double ds, boid const &boid_i,
                     std::vector<boid> const &near) {
   vector2d sp1{0., 0.};
   vector2d delta_p{0., 0.};
-  for (auto boid_j : near) {
+  for (auto &boid_j : near) {
     delta_p = boid_i.position_ - boid_j.position_;
 
     if (delta_p.norm() < ds) {
@@ -89,7 +89,7 @@ vector2d separation(double s, double ds, boid const &boid_i,
 vector2d alignment(double a, boid const &boid_i,
                    std::vector<boid> const &near) {
   vector2d sp2{0., 0.};
-  for (auto boid_j : near) {
+  for (auto &boid_j : near) {
     if (boid_j.speed_ != boid_i.speed_) {
       sp2 = sp2 + boid_j.speed_;
     }
@@ -101,7 +101,7 @@ vector2d alignment(double a, boid const &boid_i,
 
 vector2d cohesion(double c, boid const &boid_i, std::vector<boid> const &near) {
   vector2d pos_cm{0., 0.};
-  for (auto boid_j : near) {
+  for (auto &boid_j : near) {
     if (boid_j.speed_ != boid_i.speed_) {
       pos_cm = pos_cm + boid_j.position_;
     }
